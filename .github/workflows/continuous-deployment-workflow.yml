@@ -1,6 +1,10 @@
-name: Continuous Integration
-# This workflow is triggered on pushes to the repository.
-on: [push, pull_request]
+name: Continuous Deployment
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
   build:
@@ -15,4 +19,4 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ matrix.dotnet }}
-      - run: dotnet pack src/Redbox.Serilog.Stackdriver --output nupkgs
+      - run: dotnet pack src/Redbox.Serilog.Stackdriver --output nupkgs --version ${{ github.ref }}
