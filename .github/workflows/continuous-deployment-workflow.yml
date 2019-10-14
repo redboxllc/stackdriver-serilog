@@ -17,9 +17,9 @@ jobs:
       - uses: actions/checkout@master
       - name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run: echo ::set-output name=VERSION::${GITHUB_REF##*/v}
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ matrix.dotnet }}
-      - run: dotnet pack src/Redbox.Serilog.Stackdriver --output nupkgs --version ${{ steps.get_version.outputs.VERSION }}
+      - run: dotnet pack src/Redbox.Serilog.Stackdriver --output nupkgs -p:Version=${{ steps.get_version.outputs.VERSION }}
