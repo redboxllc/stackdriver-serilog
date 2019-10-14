@@ -15,4 +15,4 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ matrix.dotnet }}
-      - run: dotnet build src/Redbox.Serilog.Stackdriver
+      - run: dotnet pack src/Redbox.Serilog.Stackdriver --output nupkgs
