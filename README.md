@@ -14,11 +14,13 @@ Or you can install with the dotnet cli:
 
 `dotnet add package Redbox.Serilog.Stackdriver`
 
-## Sample Code
+## Sample Setup Code
 
-### Directly into a Serilog Instanace
+### Directly into a Serilog Instance
 
 ```csharp
+using Redbox.Serilog.Stackdriver
+
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -37,12 +39,11 @@ Be sure to add `.ReadFrom.Configuration(configuration)` to your Serilog setup fi
         "Serilog.Sinks.Console"
     ],
     "WriteTo": [
-        {
+    {
         "Name": "Console",
         "Args": {
             "formatter": "Redbox.Serilog.Stackdriver.StackdriverJsonFormatter, Redbox.Serilog.Stackdriver"
         }
-        }
-    ]
-    }
+    }]
+}
 ```
