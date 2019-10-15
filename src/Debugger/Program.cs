@@ -16,11 +16,16 @@ namespace Debugger
     {
         public static int Main(string[] args)
         {
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
-                .WriteTo.Console(new StackdriverJsonFormatter())
+                .ReadFrom.Configuration(configuration)
+                //.WriteTo.Console(new StackdriverJsonFormatter())
                 .CreateLogger();
 
             Log.Logger.Information("test");
