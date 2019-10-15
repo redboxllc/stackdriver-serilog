@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Redbox.Serilog.Stackdriver</PackageId>
-    <Authors>Redbox Automated Retail, LLC</Authors>
+    <Authors>Redbox</Authors>
     <Description>A Serilog Formatter for Stackdriver using JSON logs</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Copyright>Copyright 2019 (c) Redbox Automated Retail, LLC</Copyright>
