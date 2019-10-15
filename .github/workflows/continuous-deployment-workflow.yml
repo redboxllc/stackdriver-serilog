@@ -2,6 +2,8 @@ name: Continuous Deployment
 
 on:
   push:
+    branches:
+      - 'master'
     tags:
       - 'v*' # Run on push when tag is new version, e.g. v1.1.1
 
