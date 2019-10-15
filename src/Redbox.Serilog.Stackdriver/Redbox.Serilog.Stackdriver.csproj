@@ -8,6 +8,9 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Copyright>Copyright 2019 (c) Redbox Automated Retail, LLC</Copyright>
     <PackageTags>serilog stackdriver json log logging google</PackageTags>
+    <RepositoryUrl>https://github.com/redboxllc/stackdriver-serilog.git</RepositoryUrl> 
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
