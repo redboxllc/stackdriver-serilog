@@ -23,3 +23,4 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet }}
       - run: dotnet pack src/Redbox.Serilog.Stackdriver --output nupkgs -p:Version=${{ steps.get_version.outputs.VERSION }}
+      - run: dotnet nuget push nupkgs/Redbox.Serilog.Stackdriver.*.nupkg --api-key ${{ secrets.NUGET_API_KEY }}
