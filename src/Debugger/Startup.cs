@@ -42,6 +42,7 @@ namespace Debugger
             }
             
             app.UseSerilogRequestLogging();
+            app.UseMiddleware<StackdriverLoggingMiddleware>(); // Must be AFTER SerilogRequestLogging
             app.UseRouting();
 
             app.UseAuthorization();
