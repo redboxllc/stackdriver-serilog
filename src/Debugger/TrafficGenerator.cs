@@ -36,6 +36,7 @@ namespace Debugger
             try
             {
                 var http = new HttpClient();
+                http.DefaultRequestHeaders.Add("User-Agent", "Ditto");
                 var result = http.GetAsync("http://localhost:5000/weatherforecast").Result;
             }
             catch (Exception e)

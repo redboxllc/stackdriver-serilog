@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Redbox.Serilog.Stackdriver;
+using Serilog;
 
 namespace Debugger
 {
@@ -26,7 +28,9 @@ namespace Debugger
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHostedService<TrafficGenerator>();
-            services.AddControllers();
+            services.AddControllers(o => {
+                o.Filters.Add<SerilogMvcLoggingAttribute>();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,7 +40,8 @@ namespace Debugger
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            
+            app.UseSerilogRequestLogging();
             app.UseRouting();
 
             app.UseAuthorization();
