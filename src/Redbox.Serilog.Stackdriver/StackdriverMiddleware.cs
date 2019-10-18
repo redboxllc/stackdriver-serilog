@@ -18,7 +18,7 @@ namespace Redbox.Serilog.Stackdriver
         public async Task Invoke(HttpContext httpContext)
         {
             // Request 
-            var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+            var userAgent = httpContext?.Request?.Headers["User-Agent"].ToString();
             if(!string.IsNullOrWhiteSpace(userAgent))
             {
                 _diagnosticContext.Set("UserAgent", userAgent);

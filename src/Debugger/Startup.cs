@@ -29,7 +29,7 @@ namespace Debugger
         {
             services.AddHostedService<TrafficGenerator>();
             services.AddControllers(o => {
-                o.Filters.Add<SerilogMvcLoggingAttribute>();
+
             });
         }
 
