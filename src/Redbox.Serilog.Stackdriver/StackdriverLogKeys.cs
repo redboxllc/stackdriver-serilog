@@ -39,11 +39,14 @@ namespace Redbox.Serilog.Stackdriver
             internal static string UserAgent = "userAgent";
             internal static string Referer = "referer";
 
+            internal static string Protocol = "protocol";
+
             internal static string[] All = new[]{
                 Referer,
                 RemoteIp,
                 ServerIp,
-                UserAgent
+                UserAgent,
+                Protocol
             };
         }
     }

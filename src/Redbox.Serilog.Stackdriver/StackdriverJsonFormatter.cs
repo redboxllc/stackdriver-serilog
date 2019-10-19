@@ -64,23 +64,23 @@ namespace Redbox.Serilog.Stackdriver
             if (valueFormatter == null) throw new ArgumentNullException(nameof(valueFormatter));
 
             // TIMESTAMP
-            output.Write($"{{\"{StackdriverLogKeys.Timestamp}\":\"");
-            output.Write(logEvent.Timestamp.UtcDateTime.ToString("O"));
+            var timestamp = logEvent.Timestamp.UtcDateTime.ToString("O");
+            output.Write($"{{\"{StackdriverLogKeys.Timestamp}\":\"{timestamp}\"");
 
             // MESSAGE
-            output.Write($"{{\"{StackdriverLogKeys.Message}\":\"");
+            output.Write($",\"{StackdriverLogKeys.Message}\":");
             var message = logEvent.MessageTemplate.Render(logEvent.Properties);
             JsonValueFormatter.WriteQuotedJsonString(message, output);
 
             // FINGERPRINT
-            output.Write($"{{\"{StackdriverLogKeys.Fingerprint}\":\"");
+            output.Write($",\"{StackdriverLogKeys.Fingerprint}\":\"");
             var id = EventIdHash.Compute(logEvent.MessageTemplate.Text);
             output.Write(id.ToString("x8"));
             output.Write('"');
             
             // SEVERITY
             // https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#LogSeverity
-            output.Write($"{{\"{StackdriverLogKeys.Severity}\":\"");
+            output.Write($",\"{StackdriverLogKeys.Severity}\":\"");
             var severity = StackDriverLogLevel.GetSeverity(logEvent.Level);
             output.Write(severity);
             output.Write('\"');
@@ -88,7 +88,7 @@ namespace Redbox.Serilog.Stackdriver
             // EXCEPTION
             if (logEvent.Exception != null)
             {
-                output.Write($"{{\"{StackdriverLogKeys.Exception}\":\"");
+                output.Write($",\"{StackdriverLogKeys.Exception}\":");
                 JsonValueFormatter.WriteQuotedJsonString(logEvent.Exception.ToString(), output);
             }
 
@@ -161,14 +161,17 @@ namespace Redbox.Serilog.Stackdriver
         private static void TryOutputHttpRequest(LogEvent logEvent, TextWriter output, JsonValueFormatter formatter)
         {
             output.Write(",\"httpRequest\":{");
-            var hasFirstBeenOutput = false;
+            var prependComma = false;
             // Map the middleware injected data
             foreach(var key in StackdriverLogKeys.HttpRequest.All)
             {
-                hasFirstBeenOutput = WriteIfPresent(output, formatter, logEvent, key, key, prependComma: hasFirstBeenOutput);
+                var success = WriteIfPresent(output, formatter, logEvent, key, key, prependComma);
+                if(success) prependComma = true;
             }
+
             // Map ASP logged data
-            // ToDo: Map ASP logged data
+            WriteIfPresent(output, formatter, logEvent, "requestMethod", "RequestMethod", prependComma);
+            
             output.Write('}');
         }
     }

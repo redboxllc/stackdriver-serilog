@@ -82,5 +82,24 @@ namespace Redbox.Serilog.Stackdriver
                 _diagnosticContext.Set(StackdriverLogKeys.HttpRequest.RemoteIp, remoteIp);
             }
         }
+
+        private void HandleProtocol(HttpRequest request, IHttpConnectionFeature httpConnection)
+        {
+            if(httpConnection == null) return;
+
+            // Check for LB/proxy forwarded header first
+            var forwardedProto = request?.Headers["X-Forwarded-Proto"].ToString();
+            if(!string.IsNullOrWhiteSpace(forwardedProto))
+            {
+                _diagnosticContext.Set(StackdriverLogKeys.HttpRequest.Protocol, forwardedProto);
+                return;
+            }
+
+            var protocol = request?.Protocol;
+            if(!string.IsNullOrWhiteSpace(protocol))
+            {
+                _diagnosticContext.Set(StackdriverLogKeys.HttpRequest.Protocol, protocol);
+            }
+        }
     }
 }
