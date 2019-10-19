@@ -10,11 +10,6 @@ namespace Redbox.Serilog.Stackdriver
     /// </summary>
     public class StackdriverLoggingMiddleware
     {
-        /// <summary>
-        /// Prefix used for the key in log properties to avoid collisions with other logging frameworks or ASP
-        /// </summary>
-        /// <returns></returns>
-        public static string StackdriverKeyPrefix = $"{nameof(StackdriverLoggingMiddleware)}_";
         private readonly RequestDelegate _next;
         private readonly IDiagnosticContext _diagnosticContext;
 
@@ -40,23 +35,12 @@ namespace Redbox.Serilog.Stackdriver
             // Response
         }
 
-        /// <summary>
-        /// Adds the key and value to the log.  The key is prefixed with StackdriverKeyPrefix to avoid 
-        /// collisions with other logging middlewares/components.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        private void AddToLog(string key, string value)
-        {
-            _diagnosticContext.Set($"{StackdriverKeyPrefix}{key}", value);
-        }
-
         private void HandleUserAgent(HttpRequest request)
         {
             var userAgent = request?.Headers["User-Agent"].ToString();
             if(!string.IsNullOrWhiteSpace(userAgent))
             {
-                AddToLog("userAgent", userAgent);
+                _diagnosticContext.Set(StackdriverLogKeys.HttpRequest.UserAgent, userAgent);
             }
         }
 
@@ -65,7 +49,7 @@ namespace Redbox.Serilog.Stackdriver
             var referer = request?.Headers["Referer"].ToString();
             if(!string.IsNullOrWhiteSpace(referer))
             {
-                AddToLog("referer", referer);
+                _diagnosticContext.Set(StackdriverLogKeys.HttpRequest.Referer, referer);
             }
         }
 
@@ -75,7 +59,7 @@ namespace Redbox.Serilog.Stackdriver
             var localIpAddress = httpConnection.LocalIpAddress?.ToString();
             if(!string.IsNullOrWhiteSpace(localIpAddress))
             {
-                AddToLog("serverIp", localIpAddress);
+                _diagnosticContext.Set(StackdriverLogKeys.HttpRequest.ServerIp, localIpAddress);
             }
         }
 
@@ -86,17 +70,16 @@ namespace Redbox.Serilog.Stackdriver
             // Check for LB/proxy forwarded header first
             // If this is set Remote IP is likely incorrect
             var forwardedIp = request?.Headers["X-Forwarded-For"].ToString();
-            var key = "remoteIp";
             if(!string.IsNullOrWhiteSpace(forwardedIp))
             {
-                AddToLog(key, forwardedIp);
+                _diagnosticContext.Set(StackdriverLogKeys.HttpRequest.RemoteIp, forwardedIp);
                 return;
             }
 
             var remoteIp = httpConnection?.RemoteIpAddress?.ToString();
             if(!string.IsNullOrWhiteSpace(remoteIp))
             {
-                AddToLog(key, remoteIp);
+                _diagnosticContext.Set(StackdriverLogKeys.HttpRequest.RemoteIp, remoteIp);
             }
         }
     }

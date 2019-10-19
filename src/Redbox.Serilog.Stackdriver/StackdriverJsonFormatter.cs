@@ -23,6 +23,7 @@ using Serilog.Events;
 using Serilog.Formatting.Compact;
 using Serilog.Formatting.Json;
 using Serilog.Formatting;
+using System.Linq;
 
 namespace Redbox.Serilog.Stackdriver
 {
@@ -97,9 +98,15 @@ namespace Redbox.Serilog.Stackdriver
                 JsonValueFormatter.WriteQuotedJsonString(logEvent.Exception.ToString(), output);
             }
 
+            // HTTPREQUEST
+            TryOutputHttpRequest(logEvent, output, valueFormatter);
+
             // Custom Properties passed in by code logging
             foreach (var property in logEvent.Properties)
             {
+                // Skip any properties used by Stackdriver to avoid double logging these values
+                if(StackdriverLogKeys.All.Contains(property.Key)) continue;
+
                 var name = property.Key;
                 if (name.Length > 0 && name[0] == '@')
                 {
@@ -120,7 +127,7 @@ namespace Redbox.Serilog.Stackdriver
         /// <param name="formatter"></param>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public static void WriteKeyValue(TextWriter output, JsonValueFormatter formatter, 
+        private static void WriteKeyValue(TextWriter output, JsonValueFormatter formatter, 
             string key, LogEventPropertyValue value, bool prependComma = true)
         {
             if(prependComma) output.Write(',');
@@ -137,14 +144,37 @@ namespace Redbox.Serilog.Stackdriver
         /// <param name="logEvent"></param>
         /// <param name="outputKey"></param>
         /// <param name="inputKey"></param>
-        public static void WriteIfPresent(TextWriter output, JsonValueFormatter formatter, LogEvent logEvent, 
+        private static bool WriteIfPresent(TextWriter output, JsonValueFormatter formatter, LogEvent logEvent, 
             string outputKey, string inputKey, bool prependComma = true)
         {
             if(logEvent.Properties.ContainsKey(inputKey) && logEvent.Properties[inputKey] != null)
             {
                 var propertyValue = logEvent.Properties[inputKey];
                 WriteKeyValue(output, formatter, outputKey, propertyValue, prependComma: prependComma);
+                return true;
             }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Outputs Stackdriver's LogEvent.HttpRequest if the appropriate values are set in the LogEvent.Properties
+        /// </summary>
+        /// <param name="logEvent"></param>
+        /// <param name="output"></param>
+        /// <param name="formatter"></param>
+        private static void TryOutputHttpRequest(LogEvent logEvent, TextWriter output, JsonValueFormatter formatter)
+        {
+            output.Write(",\"httpRequest\":{");
+            var hasFirstBeenOutput = false;
+            // Map the middleware injected data
+            foreach(var key in StackdriverLogKeys.HttpRequest.All)
+            {
+                hasFirstBeenOutput = WriteIfPresent(output, formatter, logEvent, key, key, prependComma: hasFirstBeenOutput);
+            }
+            // Map ASP logged data
+            // ToDo: Map ASP logged data
+            output.Write('}');
         }
     }
 }
