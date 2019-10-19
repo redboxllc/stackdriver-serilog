@@ -63,30 +63,24 @@ namespace Redbox.Serilog.Stackdriver
             if (output == null) throw new ArgumentNullException(nameof(output));
             if (valueFormatter == null) throw new ArgumentNullException(nameof(valueFormatter));
 
-            /*
-             * 'timestamp', 'message', 'severity' and 'exception' are well-known
-             * properties that Stackdriver will use to display and analyse your 
-             * logs correctly.
-             */
-
             // TIMESTAMP
-            output.Write("{\"timestamp\":\"");
+            output.Write($"{{\"{StackdriverLogKeys.Timestamp}\":\"");
             output.Write(logEvent.Timestamp.UtcDateTime.ToString("O"));
 
             // MESSAGE
-            output.Write("\",\"message\":");
+            output.Write($"{{\"{StackdriverLogKeys.Message}\":\"");
             var message = logEvent.MessageTemplate.Render(logEvent.Properties);
             JsonValueFormatter.WriteQuotedJsonString(message, output);
 
             // FINGERPRINT
-            output.Write(",\"fingerprint\":\"");
+            output.Write($"{{\"{StackdriverLogKeys.Fingerprint}\":\"");
             var id = EventIdHash.Compute(logEvent.MessageTemplate.Text);
             output.Write(id.ToString("x8"));
             output.Write('"');
             
             // SEVERITY
             // https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#LogSeverity
-            output.Write(",\"severity\":\"");
+            output.Write($"{{\"{StackdriverLogKeys.Severity}\":\"");
             var severity = StackDriverLogLevel.GetSeverity(logEvent.Level);
             output.Write(severity);
             output.Write('\"');
@@ -94,18 +88,19 @@ namespace Redbox.Serilog.Stackdriver
             // EXCEPTION
             if (logEvent.Exception != null)
             {
-                output.Write(",\"exception\":");
+                output.Write($"{{\"{StackdriverLogKeys.Exception}\":\"");
                 JsonValueFormatter.WriteQuotedJsonString(logEvent.Exception.ToString(), output);
             }
 
             // HTTPREQUEST
             TryOutputHttpRequest(logEvent, output, valueFormatter);
 
+            var reservedKeys = StackdriverLogKeys.GetAll();
             // Custom Properties passed in by code logging
             foreach (var property in logEvent.Properties)
             {
                 // Skip any properties used by Stackdriver to avoid double logging these values
-                if(StackdriverLogKeys.All.Contains(property.Key)) continue;
+                if(reservedKeys.Contains(property.Key)) continue;
 
                 var name = property.Key;
                 if (name.Length > 0 && name[0] == '@')
@@ -158,7 +153,7 @@ namespace Redbox.Serilog.Stackdriver
         }
 
         /// <summary>
-        /// Outputs Stackdriver's LogEvent.HttpRequest if the appropriate values are set in the LogEvent.Properties
+        /// Outputs Stackdriver's LogEvent.HttpRequest if the appropriate values are set in the log properties
         /// </summary>
         /// <param name="logEvent"></param>
         /// <param name="output"></param>
