@@ -1,0 +1,50 @@
+name: Main
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-16.04
+    name: Build
+    steps:
+      # Checkout
+      - uses: actions/checkout@master
+      # Setup dotnet 3
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.0.100
+      # Build
+      - run: dotnet build -c Release
+      ################################################
+      # Create Nuget if this is a tag (release)
+      # Get tag version from git
+      - name: Get tag version
+        id: get_version
+        run: |
+          VERSION=${GITHUB_REF##*/v}
+          if [ "$VERSION" = 5 ]; then a="$c"; else a="$d"; fi
+          PRERELEASE=$([[ $VERSION == *-* ]] && echo "true" || echo "false") # if version in format 0.0.0-something, is prerelease
+          echo ::set-output name=VERSION::$VERSION
+          echo ::set-output name=PRERELEASE::$PRERELEASE
+        if: startsWith(github.ref, 'refs/tags/')
+      # Dotnet pack and nuget push
+      - name: Pack and Release
+        id: pack_release
+        run: |
+          PACKAGE="Redbox.Serilog.Stackdriver"
+          echo ::set-output name=PACKAGE::$PACKAGE
+          dotnet pack src/$PACKAGE --output nupkgs -p:Version=${{ steps.get_version.outputs.VERSION }}
+          dotnet nuget push nupkgs/$PACKAGE.*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        if: startsWith(github.ref, 'refs/tags/')
+      # Create Github release
+      - name: Github Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          prerelease: ${{ steps.get_version.outputs.PRERELEASE }}
+          body: |
+            Install instructions: 
+            `dotnet add package ${{ steps.pack_release.outputs.PACKAGE }} --version ${{ steps.get_version.outputs.VERSION }}`
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
