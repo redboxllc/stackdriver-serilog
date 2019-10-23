@@ -169,18 +169,16 @@ namespace Redbox.Serilog.Stackdriver
                 if(success) foundMiddlewareKey = true;
             }
 
-            if(!foundMiddlewareKey)
+
+            // Only add ASP properties if we found some middleware injected properties
+            // ASP logs a lot of this data 2+ times, so this ensures we only create complete httpRequest objects
+            if(foundMiddlewareKey)
             {
-                // This isn't a log event with any middleware injected properties
-                // Some httpRequest events may still be found from ASP logs
-                // but we don't want to log these as it will send an half complete httpRequest object
-                return;
+                // Map ASP logged data to Stackdriver's LogEvent.HttpRequest format
+                WriteIfPresent(output, formatter, logEvent, StackdriverLogKeys.HttpRequest.RequestMethod, "RequestMethod");
+                WriteIfPresent(output, formatter, logEvent,  StackdriverLogKeys.HttpRequest.Status, "StatusCode");    
             }
 
-            // Map ASP logged data to Stackdriver's LogEvent.HttpRequest format
-            WriteIfPresent(output, formatter, logEvent, StackdriverLogKeys.HttpRequest.RequestMethod, "RequestMethod");
-            WriteIfPresent(output, formatter, logEvent,  StackdriverLogKeys.HttpRequest.Status, "StatusCode");
-            
             output.Write('}');
         }
     }
