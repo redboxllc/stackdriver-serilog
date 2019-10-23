@@ -161,16 +161,25 @@ namespace Redbox.Serilog.Stackdriver
         private static void TryOutputHttpRequest(LogEvent logEvent, TextWriter output, JsonValueFormatter formatter)
         {
             output.Write(",\"httpRequest\":{");
-            var prependComma = false;
+            var foundMiddlewareKey = false;
             // Map the middleware injected data
-            foreach(var key in StackdriverLogKeys.HttpRequest.All)
+            foreach(var key in StackdriverLogKeys.HttpRequest.AllMiddlewareKeys)
             {
-                var success = WriteIfPresent(output, formatter, logEvent, key, key, prependComma);
-                if(success) prependComma = true;
+                var success = WriteIfPresent(output, formatter, logEvent, key, key, foundMiddlewareKey);
+                if(success) foundMiddlewareKey = true;
             }
 
-            // Map ASP logged data
-            WriteIfPresent(output, formatter, logEvent, "requestMethod", "RequestMethod", prependComma);
+            if(!foundMiddlewareKey)
+            {
+                // This isn't a log event with any middleware injected properties
+                // Some httpRequest events may still be found from ASP logs
+                // but we don't want to log these as it will send an half complete httpRequest object
+                return;
+            }
+
+            // Map ASP logged data to Stackdriver's LogEvent.HttpRequest format
+            WriteIfPresent(output, formatter, logEvent, StackdriverLogKeys.HttpRequest.RequestMethod, "RequestMethod");
+            WriteIfPresent(output, formatter, logEvent,  StackdriverLogKeys.HttpRequest.Status, "StatusCode");
             
             output.Write('}');
         }

@@ -40,8 +40,27 @@ namespace Redbox.Serilog.Stackdriver
             internal static string Referer = "referer";
 
             internal static string Protocol = "protocol";
+            internal static string RequestMethod = "requestMethod";
+            internal static string Status = "status";
+            
 
+            /// <summary>
+            /// Array of all static strings used as Log Keys
+            /// </summary>
+            /// <value></value>
             internal static string[] All = new[]{
+                Referer,
+                RemoteIp,
+                ServerIp,
+                UserAgent,
+                Protocol
+            };
+
+            /// <summary>
+            /// Array of all Log Keys set by the StackdriverMiddleware class
+            /// </summary>
+            /// <value></value>
+            internal static string[] AllMiddlewareKeys = new[]{
                 Referer,
                 RemoteIp,
                 ServerIp,
