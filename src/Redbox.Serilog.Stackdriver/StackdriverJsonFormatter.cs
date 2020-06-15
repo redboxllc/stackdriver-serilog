@@ -25,6 +25,7 @@ using Serilog.Formatting.Json;
 using Serilog.Formatting;
 using Serilog.Parsing;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Redbox.Serilog.Stackdriver
 {
@@ -38,12 +39,16 @@ namespace Redbox.Serilog.Stackdriver
         private static readonly int STACKDRIVER_ENTRY_LIMIT_BYTES = 200 * 1024; // 258kb, reduced to 200kb
 
         private readonly bool _checkForPayloadLimit;
-        readonly JsonValueFormatter _valueFormatter;
+        private readonly bool _includeMessageTemplate;
+        private readonly JsonValueFormatter _valueFormatter;
 
-        public StackdriverJsonFormatter(bool checkForPayloadLimit = true, JsonValueFormatter valueFormatter = null)
+        public StackdriverJsonFormatter(bool checkForPayloadLimit = true, 
+            bool includeMessageTemplate = true,
+            JsonValueFormatter valueFormatter = null)
         {
-            this._checkForPayloadLimit = checkForPayloadLimit;
-            this._valueFormatter = valueFormatter ?? new JsonValueFormatter(typeTagName: "$type");
+            _checkForPayloadLimit = checkForPayloadLimit;
+            _includeMessageTemplate = includeMessageTemplate;
+            _valueFormatter = valueFormatter ?? new JsonValueFormatter(typeTagName: "$type");
         }
 
         /// <summary>
@@ -104,6 +109,13 @@ namespace Redbox.Serilog.Stackdriver
             {
                 output.Write(",\"exception\":");
                 JsonValueFormatter.WriteQuotedJsonString(logEvent.Exception.ToString(), output);
+            }
+
+            // Serilog Message Template
+            if (_includeMessageTemplate)
+            {
+                output.Write(",\"messageTemplate\":");
+                JsonValueFormatter.WriteQuotedJsonString(logEvent.MessageTemplate.Text, output);
             }
 
             // Custom Properties passed in by code logging

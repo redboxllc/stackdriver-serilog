@@ -12,17 +12,23 @@ namespace Redbox.Serilog.Stackdriver.Tests
     public class StackdriverFormatterTests
     {
         private static readonly DateTimeOffset DateTimeOffset = DateTimeOffset.Now;
-        private readonly LogEvent _logEventStandard = new LogEvent(DateTimeOffset, LogEventLevel.Debug, 
-            new Exception(), new MessageTemplate("{0}", new MessageTemplateToken[] { new TextToken("Hello") }), 
-            new LogEventProperty[0]);
-
+        
         [Fact]
         public void Test_StackdriverFormatter_Format()
         {
+            var propertyName = "greeting";
+            var propertyValue = "hello";
+            var logEvent = new LogEvent(DateTimeOffset, LogEventLevel.Debug, new Exception(), 
+                new MessageTemplate("{greeting}", 
+                    new MessageTemplateToken[] { new PropertyToken(propertyName, propertyValue, "l") }), 
+                new LogEventProperty[0]);
+            
             using var writer = new StringWriter();
-            new StackdriverJsonFormatter().Format(_logEventStandard, writer);
+            new StackdriverJsonFormatter().Format(logEvent, writer);
             var logDict = GetLogLineAsDictionary(writer.ToString());
+            
             AssertValidLogLine(logDict);
+            Assert.True(logDict["message"] == propertyValue);
         }
 
         [Fact]
@@ -70,7 +76,8 @@ namespace Redbox.Serilog.Stackdriver.Tests
         /// </summary>
         /// <param name="logDict"></param>
         /// <param name="hasException"></param>
-        private void AssertValidLogLine(Dictionary<string, string> logDict, bool hasException = true)
+        private void AssertValidLogLine(Dictionary<string, string> logDict, 
+            bool hasException = true)
         {
             Assert.True(logDict.ContainsKey("message"));
             Assert.NotEmpty(logDict["message"]);
