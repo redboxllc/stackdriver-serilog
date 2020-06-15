@@ -114,7 +114,8 @@ namespace Redbox.Serilog.Stackdriver
             // Serilog Message Template
             if (_includeMessageTemplate)
             {
-                output.Write(",\"messageTemplate\":");
+                // Capitalized to match default Serilog JsonFormatter
+                output.Write(",\"MessageTemplate\":");
                 JsonValueFormatter.WriteQuotedJsonString(logEvent.MessageTemplate.Text, output);
             }
 

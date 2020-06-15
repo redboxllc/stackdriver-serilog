@@ -91,6 +91,9 @@ namespace Redbox.Serilog.Stackdriver.Tests
             
             Assert.True(logDict.ContainsKey("severity"));
             Assert.NotEmpty(logDict["severity"]);
+            
+            Assert.True(logDict.ContainsKey(("MessageTemplate")));
+            Assert.NotEmpty(logDict["MessageTemplate"]);
 
             if (hasException)
             {
