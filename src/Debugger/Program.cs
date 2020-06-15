@@ -25,7 +25,7 @@ namespace Debugger
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
                 .ReadFrom.Configuration(configuration)
-                //.WriteTo.Console(new StackdriverJsonFormatter())
+                .WriteTo.Console(new StackdriverJsonFormatter())
                 .CreateLogger();
 
             Log.Logger.Information("test");
