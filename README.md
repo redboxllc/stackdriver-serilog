@@ -54,8 +54,8 @@ The class `StackdriverJsonFormatter` has two optional arguments:
 
 #### checkForPayloadLimit
 
-Default `true`.  Detects if a long line is longer than the [Stackdriver limit](https://cloud.google.com/logging/quotas) and if so adds an additional FATAL log warning of this.
-Stackdriver will break the long line into multiple lines, which will break search functionality of the json values.
+Default `true`.  Detects if a log event is larger than the [Stackdriver limit](https://cloud.google.com/logging/quotas) and adds a second FATAL log event describing this issue.
+Stackdriver will accept the large log event but separate it into 2 or more separate events.  This will have negative effects such as breaking log searching using `jsonPayload`.
 
 #### valueFormatter
 
