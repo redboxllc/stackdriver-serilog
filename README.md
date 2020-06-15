@@ -47,3 +47,16 @@ Be sure to add `.ReadFrom.Configuration(configuration)` to your Serilog setup fi
     }]
 }
 ```
+
+### Configuration Options
+
+The class `StackdriverJsonFormatter` has two optional arguments:
+
+#### checkForPayloadLimit
+
+Default `true`.  Detects if a long line is longer than the [Stackdriver limit](https://cloud.google.com/logging/quotas) and if so adds an additional FATAL log warning of this.
+Stackdriver will break the long line into multiple lines, which will break search functionality of the json values.
+
+#### valueFormatter
+
+Defaults to `new JsonValueFormatter(typeTagName: "$type")`.  A valid Serilog JSON Formatter.

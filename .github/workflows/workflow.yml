@@ -15,7 +15,7 @@ jobs:
         with:
           dotnet-version: 3.0.100
       # Build
-      - run: dotnet build -c Release
+      - run: dotnet test -c Release && dotnet build -c Release
       ################################################
       # Create Nuget if this is a tag (release)
       # Get tag version from git

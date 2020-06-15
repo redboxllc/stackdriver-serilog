@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debugger", "src\Debugger\De
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redbox.Serilog.Stackdriver", "src\Redbox.Serilog.Stackdriver\Redbox.Serilog.Stackdriver.csproj", "{8A7D3706-F5B4-4BDC-BE8E-156EC4EA9795}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redbox.Serilog.Stackdriver.Tests", "src\Redbox.Serilog.Stackdriver.Tests\Redbox.Serilog.Stackdriver.Tests.csproj", "{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,9 +48,22 @@ Global
 		{8A7D3706-F5B4-4BDC-BE8E-156EC4EA9795}.Release|x64.Build.0 = Release|Any CPU
 		{8A7D3706-F5B4-4BDC-BE8E-156EC4EA9795}.Release|x86.ActiveCfg = Release|Any CPU
 		{8A7D3706-F5B4-4BDC-BE8E-156EC4EA9795}.Release|x86.Build.0 = Release|Any CPU
+		{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}.Debug|x64.Build.0 = Debug|Any CPU
+		{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}.Debug|x86.Build.0 = Debug|Any CPU
+		{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}.Release|x64.ActiveCfg = Release|Any CPU
+		{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}.Release|x64.Build.0 = Release|Any CPU
+		{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}.Release|x86.ActiveCfg = Release|Any CPU
+		{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{8AB26D0D-C70B-4B3C-9992-2E1D06D8E15E} = {D847B27B-0332-4D02-B278-634316C0C336}
 		{8A7D3706-F5B4-4BDC-BE8E-156EC4EA9795} = {D847B27B-0332-4D02-B278-634316C0C336}
+		{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF} = {D847B27B-0332-4D02-B278-634316C0C336}
 	EndGlobalSection
 EndGlobal
