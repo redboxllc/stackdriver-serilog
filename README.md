@@ -57,6 +57,10 @@ The class `StackdriverJsonFormatter` has two optional arguments:
 Default `true`.  Detects if a long line is longer than the [Stackdriver limit](https://cloud.google.com/logging/quotas) and if so adds an additional FATAL log warning of this.
 Stackdriver will break the long line into multiple lines, which will break search functionality of the json values.
 
+### includeMessageTemplate
+
+Default `true`.  If the Serilog Message Template should be included in the logs, e.g. ` { ... "messageTemplate" : "Hello from {name:l}" ... }`
+
 #### valueFormatter
 
 Defaults to `new JsonValueFormatter(typeTagName: "$type")`.  A valid Serilog JSON Formatter.
