@@ -59,7 +59,7 @@ Stackdriver will break the long line into multiple lines, which will break searc
 
 #### includeMessageTemplate
 
-Default `true`.  If the Serilog Message Template should be included in the logs, e.g. ` { ... "messageTemplate" : "Hello from {name:l}" ... }`
+Default `true`.  If the Serilog Message Template should be included in the logs, e.g. ` { ... "MessageTemplate" : "Hello from {name:l}" ... }`
 
 #### valueFormatter
 
