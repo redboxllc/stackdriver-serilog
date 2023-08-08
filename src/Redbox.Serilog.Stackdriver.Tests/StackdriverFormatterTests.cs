@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Serilog.Events;
 using Serilog.Parsing;
 using Xunit;
@@ -25,10 +26,10 @@ namespace Redbox.Serilog.Stackdriver.Tests
 
             using var writer = new StringWriter();
             new StackdriverJsonFormatter().Format(logEvent, writer);
-            var logDict = GetLogLineAsDictionary(writer.ToString());
+            var log = JObject.Parse(writer.ToString());
 
-            AssertValidLogLine(logDict);
-            Assert.True(logDict["message"] == propertyValue);
+            AssertValidLogLine(log);
+            Assert.True(log.Value<string>("message") == propertyValue);
         }
 
         [Fact]
@@ -50,10 +51,10 @@ namespace Redbox.Serilog.Stackdriver.Tests
             // the user of this issue
             Assert.True(lines.Length == 2);
             // Validate each line is valid json
-            var ourLogLineDict = GetLogLineAsDictionary(lines[0]);
-            AssertValidLogLine(ourLogLineDict);
-            var errorLogLineDict = GetLogLineAsDictionary(lines[1]);
-            AssertValidLogLine(errorLogLineDict, hasException: false);
+            var ourLogLine = JObject.Parse(lines[0]);
+            AssertValidLogLine(ourLogLine);
+            var errorLogLine = JObject.Parse(lines[1]);
+            AssertValidLogLine(errorLogLine, hasException: false);
         }
 
         [Fact]
@@ -63,14 +64,18 @@ namespace Redbox.Serilog.Stackdriver.Tests
             var token = new TextToken("test error");
             var logEvent = new LogEvent(DateTimeOffset, LogEventLevel.Error,
                 null, new MessageTemplate("{0}", new MessageTemplateToken[] { token }),
-                Array.Empty<LogEventProperty>());
+                new[] { new LogEventProperty("SourceContext", new ScalarValue("the source context")) });
 
             using var writer = new StringWriter();
             new StackdriverJsonFormatter(markErrorsForErrorReporting: true).Format(logEvent, writer);
-            var logDict = GetLogLineAsDictionary(writer.ToString());
+            var log = JObject.Parse(writer.ToString());
 
-            AssertValidLogLine(logDict, false);
-            Assert.True(logDict["@type"] == "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent");
+            AssertValidLogLine(log, false);
+            Assert.Equal(
+                "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent",
+                log.Value<string>("@type")
+            );
+            Assert.Equal("the source context", log.SelectToken("context.reportLocation.filePath")?.Value<string>());
         }
 
         private string[] SplitLogLogs(string logLines)
@@ -79,43 +84,33 @@ namespace Redbox.Serilog.Stackdriver.Tests
         }
 
         /// <summary>
-        /// Gets a log line in json format as a dictionary of string pairs
-        /// </summary>
-        /// <param name="log"></param>
-        /// <returns></returns>
-        private Dictionary<string, string> GetLogLineAsDictionary(string log)
-        {
-            return JsonConvert.DeserializeObject<Dictionary<string, string>>(log);
-        }
-
-        /// <summary>
         /// Asserts required fields in log output are set and have valid values
         /// </summary>
-        /// <param name="logDict"></param>
+        /// <param name="log"></param>
         /// <param name="hasException"></param>
-        private void AssertValidLogLine(Dictionary<string, string> logDict,
+        private void AssertValidLogLine(JObject log,
             bool hasException = true)
         {
-            Assert.True(logDict.ContainsKey("message"));
-            Assert.NotEmpty(logDict["message"]);
+            Assert.True(log.ContainsKey("message"));
+            Assert.NotEmpty(log.Value<string>("message"));
 
-            Assert.True(logDict.ContainsKey("timestamp"));
+            Assert.True(log.ContainsKey("timestamp"));
             var timestamp = DateTimeOffset.UtcDateTime.ToString("O");
-            Assert.Equal(logDict["timestamp"], timestamp);
+            Assert.Equal(log.Value<DateTime>("timestamp").ToString("O"), timestamp);
 
-            Assert.True(logDict.ContainsKey("fingerprint"));
-            Assert.NotEmpty(logDict["fingerprint"]);
+            Assert.True(log.ContainsKey("fingerprint"));
+            Assert.NotEmpty(log.Value<string>("fingerprint"));
 
-            Assert.True(logDict.ContainsKey("severity"));
-            Assert.NotEmpty(logDict["severity"]);
+            Assert.True(log.ContainsKey("severity"));
+            Assert.NotEmpty(log.Value<string>("severity"));
 
-            Assert.True(logDict.ContainsKey(("MessageTemplate")));
-            Assert.NotEmpty(logDict["MessageTemplate"]);
+            Assert.True(log.ContainsKey(("MessageTemplate")));
+            Assert.NotEmpty(log.Value<string>("MessageTemplate"));
 
             if (hasException)
             {
-                Assert.True(logDict.ContainsKey("exception"));
-                Assert.NotEmpty(logDict["exception"]);
+                Assert.True(log.ContainsKey("exception"));
+                Assert.NotEmpty(log.Value<string>("exception"));
             }
         }
     }

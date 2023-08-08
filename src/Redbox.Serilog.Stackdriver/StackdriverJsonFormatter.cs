@@ -127,6 +127,14 @@ namespace Redbox.Serilog.Stackdriver
             {
                 output.Write(",\"@type\":");
                 output.Write("\"type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent\"");
+                
+                logEvent.Properties.TryGetValue("SourceContext", out var sourceContext);
+                if (sourceContext != null)
+                {
+                    output.Write(",\"context\":{\"reportLocation\":{");
+                    WriteKeyValue(output, valueFormatter, "filePath", sourceContext, false);
+                    output.Write("}}");
+                }
             }
 
             // Custom Properties passed in by code logging
