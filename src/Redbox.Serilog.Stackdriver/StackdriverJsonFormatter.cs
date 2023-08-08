@@ -26,6 +26,7 @@ using Serilog.Formatting;
 using Serilog.Parsing;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Redbox.Serilog.Stackdriver
 {
@@ -40,15 +41,26 @@ namespace Redbox.Serilog.Stackdriver
 
         private readonly bool _checkForPayloadLimit;
         private readonly bool _includeMessageTemplate;
+        private readonly bool _markErrorsForErrorReporting;
         private readonly JsonValueFormatter _valueFormatter;
+        private readonly LogEventPropertyValue _assemblyVersion;
+        private readonly LogEventPropertyValue _assemblyName;
 
         public StackdriverJsonFormatter(bool checkForPayloadLimit = true, 
             bool includeMessageTemplate = true,
-            JsonValueFormatter valueFormatter = null)
+            JsonValueFormatter valueFormatter = null,
+            bool markErrorsForErrorReporting = false,
+            string serviceName = null,
+            string serviceVersion = null)
         {
             _checkForPayloadLimit = checkForPayloadLimit;
             _includeMessageTemplate = includeMessageTemplate;
+            _markErrorsForErrorReporting = markErrorsForErrorReporting;
             _valueFormatter = valueFormatter ?? new JsonValueFormatter(typeTagName: "$type");
+            
+            var assemblyName = Assembly.GetEntryAssembly()?.GetName();
+            _assemblyName = new ScalarValue(serviceName ?? assemblyName?.Name);
+            _assemblyVersion = new ScalarValue(serviceVersion ?? assemblyName?.Version.ToString());
         }
 
         /// <summary>
@@ -117,6 +129,30 @@ namespace Redbox.Serilog.Stackdriver
                 // Capitalized to match default Serilog JsonFormatter
                 output.Write(",\"MessageTemplate\":");
                 JsonValueFormatter.WriteQuotedJsonString(logEvent.MessageTemplate.Text, output);
+            }
+            
+            // Give logs with severity: ERROR a type of ReportedErrorEvent
+            if (_markErrorsForErrorReporting && logEvent.Level >= LogEventLevel.Error)
+            {
+                // Set @type so that Cloud Error Reporting will recognize this error
+                output.Write(",\"@type\":");
+                output.Write("\"type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent\"");
+                
+                // If SourceContext is defined, set context.reportLocation to this value.
+                // We use filePath, the highest-level parameter of reportLocation, as it does not have a className parameter.
+                logEvent.Properties.TryGetValue("SourceContext", out var sourceContext);
+                if (sourceContext != null)
+                {
+                    output.Write(",\"context\":{\"reportLocation\":{");
+                    WriteKeyValue(output, valueFormatter, "filePath", sourceContext, false);
+                    output.Write("}}");
+                }
+                
+                // Set the serviceContext
+                output.Write(",\"serviceContext\":{");
+                WriteKeyValue(output, valueFormatter, "service", _assemblyName, false);
+                WriteKeyValue(output, valueFormatter, "version", _assemblyVersion);
+                output.Write("}");
             }
 
             // Custom Properties passed in by code logging
