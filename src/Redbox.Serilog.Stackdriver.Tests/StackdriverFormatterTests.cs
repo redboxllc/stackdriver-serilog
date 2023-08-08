@@ -12,21 +12,21 @@ namespace Redbox.Serilog.Stackdriver.Tests
     public class StackdriverFormatterTests
     {
         private static readonly DateTimeOffset DateTimeOffset = DateTimeOffset.Now;
-        
+
         [Fact]
         public void Test_StackdriverFormatter_Format()
         {
             var propertyName = "greeting";
             var propertyValue = "hello";
-            var logEvent = new LogEvent(DateTimeOffset, LogEventLevel.Debug, new Exception(), 
-                new MessageTemplate("{greeting}", 
-                    new MessageTemplateToken[] { new PropertyToken(propertyName, propertyValue, "l") }), 
+            var logEvent = new LogEvent(DateTimeOffset, LogEventLevel.Debug, new Exception(),
+                new MessageTemplate("{greeting}",
+                    new MessageTemplateToken[] { new PropertyToken(propertyName, propertyValue, "l") }),
                 new LogEventProperty[0]);
-            
+
             using var writer = new StringWriter();
             new StackdriverJsonFormatter().Format(logEvent, writer);
             var logDict = GetLogLineAsDictionary(writer.ToString());
-            
+
             AssertValidLogLine(logDict);
             Assert.True(logDict["message"] == propertyValue);
         }
@@ -36,14 +36,14 @@ namespace Redbox.Serilog.Stackdriver.Tests
         {
             // Creates a large string > 200kb
             var token = new TextToken(new string('*', 51200));
-            var logEvent = new LogEvent(DateTimeOffset, LogEventLevel.Debug, 
-                new Exception(), new MessageTemplate("{0}", new MessageTemplateToken[] { token }), 
+            var logEvent = new LogEvent(DateTimeOffset, LogEventLevel.Debug,
+                new Exception(), new MessageTemplate("{0}", new MessageTemplateToken[] { token }),
                 new LogEventProperty[0]);
-            
+
             using var writer = new StringWriter();
             new StackdriverJsonFormatter().Format(logEvent, writer);
             var lines = SplitLogLogs(writer.ToString());
-            
+
             // The log created was longer than Stackdriver's soft limit of 256 bytes
             // This means the json will be spread out onto two lines, breaking search
             // In this scenario the library should add an additional log event informing
@@ -54,6 +54,23 @@ namespace Redbox.Serilog.Stackdriver.Tests
             AssertValidLogLine(ourLogLineDict);
             var errorLogLineDict = GetLogLineAsDictionary(lines[1]);
             AssertValidLogLine(errorLogLineDict, hasException: false);
+        }
+
+        [Fact]
+        public void Test_StackdriverFormatter_MarkErrorsForErrorReporting()
+        {
+            // Creates a large string > 200kb
+            var token = new TextToken("test error");
+            var logEvent = new LogEvent(DateTimeOffset, LogEventLevel.Error,
+                null, new MessageTemplate("{0}", new MessageTemplateToken[] { token }),
+                Array.Empty<LogEventProperty>());
+
+            using var writer = new StringWriter();
+            new StackdriverJsonFormatter(markErrorsForErrorReporting: true).Format(logEvent, writer);
+            var logDict = GetLogLineAsDictionary(writer.ToString());
+
+            AssertValidLogLine(logDict, false);
+            Assert.True(logDict["@type"] == "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent");
         }
 
         private string[] SplitLogLogs(string logLines)
@@ -76,22 +93,22 @@ namespace Redbox.Serilog.Stackdriver.Tests
         /// </summary>
         /// <param name="logDict"></param>
         /// <param name="hasException"></param>
-        private void AssertValidLogLine(Dictionary<string, string> logDict, 
+        private void AssertValidLogLine(Dictionary<string, string> logDict,
             bool hasException = true)
         {
             Assert.True(logDict.ContainsKey("message"));
             Assert.NotEmpty(logDict["message"]);
-            
+
             Assert.True(logDict.ContainsKey("timestamp"));
             var timestamp = DateTimeOffset.UtcDateTime.ToString("O");
             Assert.Equal(logDict["timestamp"], timestamp);
-            
+
             Assert.True(logDict.ContainsKey("fingerprint"));
             Assert.NotEmpty(logDict["fingerprint"]);
-            
+
             Assert.True(logDict.ContainsKey("severity"));
             Assert.NotEmpty(logDict["severity"]);
-            
+
             Assert.True(logDict.ContainsKey(("MessageTemplate")));
             Assert.NotEmpty(logDict["MessageTemplate"]);
 

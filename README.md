@@ -50,7 +50,7 @@ Be sure to add `.ReadFrom.Configuration(configuration)` to your Serilog setup fi
 
 ### Configuration Options
 
-The class `StackdriverJsonFormatter` has two optional arguments:
+The class `StackdriverJsonFormatter` has some optional arguments.
 
 #### checkForPayloadLimit
 
@@ -61,6 +61,30 @@ Stackdriver will break the long line into multiple lines, which will break searc
 
 Default `true`.  If the Serilog Message Template should be included in the logs, e.g. ` { ... "MessageTemplate" : "Hello from {name:l}" ... }`
 
+#### markErrorsForErrorReporting
+Default `false`. If the `@type` property of the logs should be set to `type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent` when the log level is Error or above.
+This causes GCP to send these logs to Cloud Error Reporting. See [documentation](https://cloud.google.com/error-reporting/docs/grouping-errors).
+
 #### valueFormatter
 
 Defaults to `new JsonValueFormatter(typeTagName: "$type")`.  A valid Serilog JSON Formatter.
+
+Options can be passed in the `StackdriverJsonFormatter` constructor, or set in appsettings.json:
+```json
+"Serilog": {
+    "Using": [
+        "Serilog.Sinks.Console"
+    ],
+    "WriteTo": [
+    {
+        "Name": "Console",
+        "Args": {
+          "formatter": {
+            "type": "Redbox.Serilog.Stackdriver.StackdriverJsonFormatter, Redbox.Serilog.Stackdriver",
+            "markErrorsForErrorReporting": true,
+            "includeMessageTemplate": false
+          }        
+        }
+    }]
+}
+```

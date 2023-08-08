@@ -40,14 +40,17 @@ namespace Redbox.Serilog.Stackdriver
 
         private readonly bool _checkForPayloadLimit;
         private readonly bool _includeMessageTemplate;
+        private readonly bool _markErrorsForErrorReporting;
         private readonly JsonValueFormatter _valueFormatter;
 
         public StackdriverJsonFormatter(bool checkForPayloadLimit = true, 
             bool includeMessageTemplate = true,
-            JsonValueFormatter valueFormatter = null)
+            JsonValueFormatter valueFormatter = null,
+            bool markErrorsForErrorReporting = false)
         {
             _checkForPayloadLimit = checkForPayloadLimit;
             _includeMessageTemplate = includeMessageTemplate;
+            _markErrorsForErrorReporting = markErrorsForErrorReporting;
             _valueFormatter = valueFormatter ?? new JsonValueFormatter(typeTagName: "$type");
         }
 
@@ -117,6 +120,13 @@ namespace Redbox.Serilog.Stackdriver
                 // Capitalized to match default Serilog JsonFormatter
                 output.Write(",\"MessageTemplate\":");
                 JsonValueFormatter.WriteQuotedJsonString(logEvent.MessageTemplate.Text, output);
+            }
+            
+            // Give logs with severity: ERROR a type of ReportedErrorEvent
+            if (_markErrorsForErrorReporting && logEvent.Level >= LogEventLevel.Error)
+            {
+                output.Write(",\"@type\":");
+                output.Write("\"type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent\"");
             }
 
             // Custom Properties passed in by code logging
