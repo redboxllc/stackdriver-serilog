@@ -50,7 +50,7 @@ Be sure to add `.ReadFrom.Configuration(configuration)` to your Serilog setup fi
 
 ### Configuration Options
 
-The class `StackdriverJsonFormatter` has some optional arguments.
+The class `StackdriverJsonFormatter` has some optional arguments:
 
 #### checkForPayloadLimit
 
