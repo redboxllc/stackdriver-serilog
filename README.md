@@ -65,6 +65,16 @@ Default `true`.  If the Serilog Message Template should be included in the logs,
 Default `false`. If the `@type` property of the logs should be set to `type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent` when the log level is Error or above.
 This causes GCP to send these logs to Cloud Error Reporting. See [documentation](https://cloud.google.com/error-reporting/docs/grouping-errors).
 
+#### serviceName
+Defaults to the executing assembly name. Sets the service name used by GCP error reporting. 
+
+#### serviceVersion
+Defaults to the executing assembly version. Sets the service version used by GCP error reporting.
+
+#### markErrorsForErrorReporting
+Default `false`. If the `@type` property of the logs should be set to `type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent` when the log level is Error or above.
+This causes GCP to send these logs to Cloud Error Reporting. See [documentation](https://cloud.google.com/error-reporting/docs/grouping-errors).
+
 #### valueFormatter
 
 Defaults to `new JsonValueFormatter(typeTagName: "$type")`.  A valid Serilog JSON Formatter.

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog.Events;
@@ -71,11 +72,20 @@ namespace Redbox.Serilog.Stackdriver.Tests
             var log = JObject.Parse(writer.ToString());
 
             AssertValidLogLine(log, false);
+            
+            // @type
             Assert.Equal(
                 "type.googleapis.com/google.devtools.clouderrorreporting.v1beta1.ReportedErrorEvent",
                 log.Value<string>("@type")
             );
+            
+            // Report location
             Assert.Equal("the source context", log.SelectToken("context.reportLocation.filePath")?.Value<string>());
+            
+            // Service context
+            var assemblyName = Assembly.GetEntryAssembly()?.GetName();
+            Assert.Equal(assemblyName?.Name, log.SelectToken("serviceContext.service")?.Value<string>());
+            Assert.Equal(assemblyName?.Version?.ToString(), log.SelectToken("serviceContext.version")?.Value<string>());
         }
 
         private string[] SplitLogLogs(string logLines)
