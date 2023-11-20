@@ -4,16 +4,16 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu
     name: Build
     steps:
       # Checkout
       - uses: actions/checkout@master
-      # Setup dotnet 3
+      # Setup dotnet 8
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.301
+          dotnet-version: 8.x
       # Build
       - run: dotnet test -c Release && dotnet build -c Release
       ################################################

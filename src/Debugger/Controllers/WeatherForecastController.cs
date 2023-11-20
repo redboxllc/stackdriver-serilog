@@ -36,7 +36,11 @@ namespace Debugger.Controllers
             })
             .ToArray();
 
-            _logger.LogInformation($"Returning some weather!");
+            var maxTemp = weather.Max(w => w.TemperatureC);
+            using (var scope = _logger.BeginScope("{MaximumTemperature}", maxTemp))
+            {
+                _logger.LogInformation($"Returning some weather!");
+            }
 
             return weather;
         }
