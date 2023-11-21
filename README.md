@@ -1,5 +1,7 @@
 # Stackdriver Formatter for Serilog
 
+**This is a fork of the original Redbox project, updated for Serilog v3 and with a .NET 8.0 example.**
+
 A Stackdriver JSON Formatter for logging with Serilog and .NET.  Useful when a dependency on the Google SDK is not wanted or when a logs are being sent to Stackdriver using a data collector or log shipper (e.g. Fluentd).
 
 ## Serilog Sinks
@@ -8,18 +10,18 @@ There is no dependency on any particular Serilog Sinks.  Pass in an instance of 
 
 ## Installing
 
-A `netstandard2.0` Nuget package is available [here](https://www.nuget.org/packages/Redbox.Serilog.Stackdriver/).
+A `netstandard2.0` Nuget package is available [here](https://www.nuget.org/packages/Raileasy.Serilog.Stackdriver/).
 
 Or you can install with the dotnet cli:
 
-`dotnet add package Redbox.Serilog.Stackdriver`
+`dotnet add package Raileasy.Serilog.Stackdriver`
 
 ## Sample Setup Code
 
 ### Directly into a Serilog Instance
 
 ```csharp
-using Redbox.Serilog.Stackdriver
+using Raileasy.Serilog.Stackdriver
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -42,7 +44,7 @@ Be sure to add `.ReadFrom.Configuration(configuration)` to your Serilog setup fi
     {
         "Name": "Console",
         "Args": {
-            "formatter": "Redbox.Serilog.Stackdriver.StackdriverJsonFormatter, Redbox.Serilog.Stackdriver"
+            "formatter": "Raileasy.Serilog.Stackdriver.StackdriverJsonFormatter, Raileasy.Serilog.Stackdriver"
         }
     }]
 }

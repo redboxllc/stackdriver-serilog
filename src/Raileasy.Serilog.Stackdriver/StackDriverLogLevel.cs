@@ -18,7 +18,7 @@
 
 using Serilog.Events;
 
-namespace Redbox.Serilog.Stackdriver
+namespace Raileasy.Serilog.Stackdriver
 {
     /// <summary>
     /// Mappings of Microsoft/Serilog Log Levels to Stackdriver

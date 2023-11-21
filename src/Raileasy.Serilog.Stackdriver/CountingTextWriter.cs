@@ -19,7 +19,7 @@
 using System.IO;
 using System.Text;
 
-namespace Redbox.Serilog.Stackdriver
+namespace Raileasy.Serilog.Stackdriver
 {
     /// <summary>
     /// Custom minimal text writer that will pass-through to a provided text writer but whilst doing so will

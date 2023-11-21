@@ -25,9 +25,8 @@ using Serilog.Formatting.Json;
 using Serilog.Formatting;
 using Serilog.Parsing;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace Redbox.Serilog.Stackdriver
+namespace Raileasy.Serilog.Stackdriver
 {
     /// <summary>
     /// Custom JSON formatter based on the built-in RenderedCompactJsonFormatter 

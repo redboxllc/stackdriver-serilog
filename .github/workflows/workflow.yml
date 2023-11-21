@@ -4,16 +4,16 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu
     name: Build
     steps:
       # Checkout
       - uses: actions/checkout@master
-      # Setup dotnet 3
+      # Setup dotnet 8
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.301
+          dotnet-version: 8.x
       # Build
       - run: dotnet test -c Release && dotnet build -c Release
       ################################################
@@ -32,7 +32,7 @@ jobs:
       - name: Pack and Release
         id: pack_release
         run: |
-          PACKAGE="Redbox.Serilog.Stackdriver"
+          PACKAGE="Raileasy.Serilog.Stackdriver"
           echo ::set-output name=PACKAGE::$PACKAGE
           dotnet pack src/$PACKAGE --output nupkgs -p:Version=${{ steps.get_version.outputs.VERSION }}
           dotnet nuget push nupkgs/$PACKAGE.*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
