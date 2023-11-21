@@ -32,7 +32,7 @@ jobs:
       - name: Pack and Release
         id: pack_release
         run: |
-          PACKAGE="Redbox.Serilog.Stackdriver"
+          PACKAGE="Raileasy.Serilog.Stackdriver"
           echo ::set-output name=PACKAGE::$PACKAGE
           dotnet pack src/$PACKAGE --output nupkgs -p:Version=${{ steps.get_version.outputs.VERSION }}
           dotnet nuget push nupkgs/$PACKAGE.*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json

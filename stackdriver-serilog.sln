@@ -7,9 +7,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D847B27B-033
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debugger", "src\Debugger\Debugger.csproj", "{8AB26D0D-C70B-4B3C-9992-2E1D06D8E15E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redbox.Serilog.Stackdriver", "src\Redbox.Serilog.Stackdriver\Redbox.Serilog.Stackdriver.csproj", "{8A7D3706-F5B4-4BDC-BE8E-156EC4EA9795}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raileasy.Serilog.Stackdriver", "src\Raileasy.Serilog.Stackdriver\Raileasy.Serilog.Stackdriver.csproj", "{8A7D3706-F5B4-4BDC-BE8E-156EC4EA9795}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Redbox.Serilog.Stackdriver.Tests", "src\Redbox.Serilog.Stackdriver.Tests\Redbox.Serilog.Stackdriver.Tests.csproj", "{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raileasy.Serilog.Stackdriver.Tests", "src\Raileasy.Serilog.Stackdriver.Tests\Raileasy.Serilog.Stackdriver.Tests.csproj", "{A40DA383-9EDB-4159-A419-AC7B6CB0EDFF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Raileasy.Serilog.Stackdriver</PackageId>
+    <Authors>Redbox</Authors>
+    <Description>A Serilog Formatter for Stackdriver using JSON logs</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Copyright>Copyright 2019 (c) Redbox Automated Retail, LLC</Copyright>
+    <PackageTags>serilog stackdriver json log logging google</PackageTags>
+    <RepositoryUrl>https://github.com/raileasyuk/stackdriver-serilog.git</RepositoryUrl> 
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
+    <PackageReference Include="Serilog.Formatting.Compact" Version="1.0.0" />
+  </ItemGroup>
+
+
+
+</Project>
